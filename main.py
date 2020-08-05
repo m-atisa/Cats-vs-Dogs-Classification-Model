@@ -27,11 +27,19 @@ cat_test = os.path.join('/home/mathew/Documents/Mathew/Cats-vs-Dogs-Classificati
 
 print('Total training images_dogs:', len(os.listdir(dog_train)))
 print('Total training images_cats:', len(os.listdir(cat_train)))
-
-# All images will be rescaled by 1./255
-train_datagen = ImageDataGenerator(rescale=1.0/255.0)
-test_datagen = ImageDataGenerator(rescale=1.0/255.0)
 #%%
+# All images will be rescaled by 1./255
+train_datagen = ImageDataGenerator(
+    rescale=1.0/255,
+    rotation_range=40,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest')
+test_datagen = ImageDataGenerator(rescale=1.0/255)
+
 # Flow training images in batches of 128 using train_datagen generator
 train_generator = train_datagen.flow_from_directory(
     # This is the source directory for training images
@@ -51,10 +59,10 @@ test_generator = test_datagen.flow_from_directory(
 model = tf.keras.models.Sequential([
     # Note the input shape is the desired size of the image 300x300 with 3 bytes color
     # This is the first convolution
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)),
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(150, 150, 3)),
     tf.keras.layers.MaxPooling2D(2, 2),
     # The second convolution
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2, 2),
     # The third convolution
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
@@ -62,7 +70,7 @@ model = tf.keras.models.Sequential([
     # Flatten the results to feed into a DNN
     tf.keras.layers.Flatten(),
     # 512 neuron hidden layer
-    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(512, activation='relu'),
     # Dropout layer to prevent overfitting
     # tf.keras.layers.Dropout(.3),
     # outputs to the 
